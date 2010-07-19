@@ -5,13 +5,13 @@
 #include <highgui.h>
 #include <stdio.h>
 #include <cv.h>
-#include <cxcore.h>
-#include <cxcore.h>
+//#include <cxcore.h>
+//#include <cxcore.h>
 
 int main(int argc, char *argv[]) {
     bool verbose = true;
-    string input_image_path = "hello.jpg";
-    string output_image_path = "output.jpg";
+    std::string input_image_path = "hello.jpg";
+    std::string output_image_path = "output.jpg";
 
     int output_width = 128;
     int output_height = 128;
