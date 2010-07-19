@@ -27,4 +27,4 @@ src/config.h.in
 src/cropit
 src/cropit-main.o
 src/stamp-h1
-
+*.jpg

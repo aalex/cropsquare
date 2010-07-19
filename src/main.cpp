@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 // OpenCV:
-#include <cvaux.h>
+//#include <cvaux.h>
 #include <highgui.h>
 #include <stdio.h>
 #include <cv.h>
