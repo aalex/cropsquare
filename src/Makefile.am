@@ -1,0 +1,21 @@
+bin_PROGRAMS = cropit 
+
+cropit_SOURCES = \
+	main.cpp
+
+cropit_CXXFLAGS = \
+	$(BOOST_CPPFLAGS) \
+	$(OPENCV_CFLAGS) \
+	$(LIBM_CXXFLAGS) \
+	$(LIBTHREAD_CXXFLAGS)
+ 
+cropit_LDADD = \
+	$(BOOST_FILESYSTEM_LIB) \
+	$(BOOST_LDFLAGS) \
+	$(BOOST_LIBS)  \
+	$(BOOST_PROGRAM_OPTIONS_LIB) \
+	$(BOOST_THREAD_LIB) \
+	$(OPENCV_LIBS) \
+	$(LIBM_LIBS) \
+	$(LIBTHREAD_LIBS) 
+
