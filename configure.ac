@@ -50,15 +50,15 @@ if test "x${ax_cv_boost_filesystem}" = "xno" ; then
 	AC_MSG_ERROR([missing package: libboost-filesystem-dev])
 fi
 
-AX_BOOST_THREAD
-if test "x${ax_cv_boost_thread}" = "xno" ; then
-    AC_MSG_ERROR([missing package: libboost-thread-dev])
-fi
-
-AX_BOOST_DATE_TIME
-if test "x${ax_cv_boost_date_time}" = "xno" ; then
-	AC_MSG_ERROR([missing package: libboost-date-time-dev])
-fi
+# AX_BOOST_THREAD
+# if test "x${ax_cv_boost_thread}" = "xno" ; then
+#     AC_MSG_ERROR([missing package: libboost-thread-dev])
+# fi
+# 
+# AX_BOOST_DATE_TIME
+# if test "x${ax_cv_boost_date_time}" = "xno" ; then
+# 	AC_MSG_ERROR([missing package: libboost-date-time-dev])
+# fi
 
 AX_BOOST_SYSTEM
 if test "x${ax_cv_boost_system}" = "xno" ; then

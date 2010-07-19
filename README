@@ -1,4 +1,18 @@
 cropit
 ------
 
-Crops and resizes images with OpenCV
+Crops and resizes images.
+
+Dependencies
+------------
+
+To build, one needs to install the following Debian packages. There should be 
+similar names for each of those on other operating systems.
+
+ * libcv-dev
+ * libcvaux-dev
+ * libhighgui-dev
+ * libboost-program-options1.40-dev
+ * libboost-filesystem1.40-dev
+ * libboost-system1.40-dev
+
