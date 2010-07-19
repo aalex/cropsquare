@@ -35,8 +35,11 @@ int main(int argc, char *argv[]) {
     //    std::cout << "Image types: input is " << input_image.type() << " and target size image is " << image_of_desired_size.type() << std::endl;
     try {
         cvResize(input_image, image_of_desired_size, CV_INTER_LINEAR);
-    } catch (const std::exception &e) { // cv::Exception &e) {
-        //const char* error_message = e.what();
+    } catch (const cv::Exception &e) {
+        std::cout << e.err << std::endl;
+        std::cout << "Will exit with error." << std::endl;
+        exit(1);
+    } catch (const std::exception &e) {
         std::cout << e.what() << std::endl;
         std::cout << "Will exit with error." << std::endl;
         exit(1);
@@ -44,7 +47,17 @@ int main(int argc, char *argv[]) {
     
     if (verbose)
         std::cout << "Saving image as " << output_image_path << std::endl;
-    cvSaveImage(output_image_path.c_str(), &image_of_desired_size);
+    try {
+        cvSaveImage(output_image_path.c_str(), image_of_desired_size);
+    } catch (const cv::Exception &e) {
+        std::cout << e.err << std::endl;
+        std::cout << "Will exit with error." << std::endl;
+        exit(1);
+    } catch (const std::exception &e) {
+        std::cout << e.what() << std::endl;
+        std::cout << "Will exit with error." << std::endl;
+        exit(1);
+    }
     
     if (verbose)
         std::cout << "Freeing image data." << std::endl;
