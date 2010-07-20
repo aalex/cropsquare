@@ -12,7 +12,7 @@ similar names for each of those on other operating systems.
  * libcv-dev
  * libcvaux-dev
  * libhighgui-dev
- * libboost-program-options1.40-dev
- * libboost-filesystem1.40-dev
- * libboost-system1.40-dev
+ * libboost-program-options-dev
+ * libboost-filesystem-dev
+ * libboost-system-dev
 
