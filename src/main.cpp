@@ -28,10 +28,68 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 
-namespace po = boost::program_options;
-namespace fs = boost::filesystem;
+/**
+ * Reads an image, crops it, resize the result and save it as a new image. 
+ */
+int crop_and_resize(std::string input_image_path, std::string output_image_path, int output_width, int output_height, bool verbose) {
+    if (verbose)
+        std::cout << "Loading image " << input_image_path << std::endl;
+    IplImage* input_image = cvLoadImage(input_image_path.c_str());
+    if (!input_image) {
+        std::cout << "Could not load image file " << input_image_path << std::endl;
+        exit(1);
+    }
+    CvSize size = cvSize(output_width, output_height);
+    if (verbose)
+        std::cout << "Resizing image to " << output_width << "x" << output_height << std::endl;
 
+    IplImage* output_image = cvCreateImage(size, input_image->depth, input_image->nChannels);
+    
+    //if (verbose)
+    //    std::cout << "Image types: input is " << input_image.type() << " and target size image is " << output_image.type() << std::endl;
+    try {
+        cvResize(input_image, output_image, CV_INTER_LINEAR);
+    } catch (const cv::Exception &e) {
+        std::cout << e.err << std::endl;
+        std::cout << "Will exit with error." << std::endl;
+        exit(1);
+    } catch (const std::exception &e) {
+        std::cout << e.what() << std::endl;
+        std::cout << "Will exit with error." << std::endl;
+        exit(1);
+    }
+    
+    if (verbose)
+        std::cout << "Saving image as " << output_image_path << std::endl;
+    try {
+        cvSaveImage(output_image_path.c_str(), output_image);
+    } catch (const cv::Exception &e) {
+        std::cout << e.err << std::endl;
+        std::cout << "Will exit with error." << std::endl;
+        exit(1);
+    } catch (const std::exception &e) {
+        std::cout << e.what() << std::endl;
+        std::cout << "Will exit with error." << std::endl;
+        exit(1);
+    }
+    
+    if (verbose)
+        std::cout << "Freeing image data." << std::endl;
+    cvReleaseImage(&output_image);
+    cvReleaseImage(&input_image);
+    if (verbose)
+        std::cout << "Success!" << std::endl;
+
+    return 0;
+}
+
+/**
+ * Main program entry
+ */
 int main(int argc, char *argv[]) {
+    namespace po = boost::program_options;
+    namespace fs = boost::filesystem;
+    
     bool verbose = false;
     std::string input_image_path = "input.jpg";
     std::string output_image_path = "output.jpg";
@@ -44,8 +102,8 @@ int main(int argc, char *argv[]) {
     desc.add_options()
         ("help,h", "Show this help message and exit")
         //("mode,m", po::value<std::string>()->default_value(mode), "How the region of interest is detected")
-        ("input,i", po::value<std::string>()->default_value(input_image_path), "Input image") /* TODO: use an arg */
-        ("output,o", po::value<std::string>()->default_value(output_image_path), "Output image") /* TODO: use an arg */
+        ("input,i", po::value<std::string>()->default_value(input_image_path), "Input image file name") /* TODO: use an arg */
+        ("output,o", po::value<std::string>()->default_value(output_image_path), "Output image file name") /* TODO: use an arg */
         ("version", "Show program's version number and exit")
         ("verbose,v", po::bool_switch(), "Enables a verbose output")
         ("width,w", po::value<int>()->default_value(output_width), "Width of the resized image.")
@@ -95,54 +153,6 @@ int main(int argc, char *argv[]) {
     } // TODO: make it easy to create a square image.
 
     // Now, let's do it:
-    if (verbose)
-        std::cout << "Loading image " << input_image_path << std::endl;
-    IplImage* input_image = cvLoadImage(input_image_path.c_str());
-    if (!input_image) {
-        std::cout << "Could not load image file " << input_image_path << std::endl;
-        exit(1);
-    }
-    CvSize size = cvSize(output_width, output_height);
-    if (verbose)
-        std::cout << "Resizing image to " << output_width << "x" << output_height << std::endl;
-
-    IplImage* image_of_desired_size = cvCreateImage(size, input_image->depth, input_image->nChannels);
-    
-    //if (verbose)
-    //    std::cout << "Image types: input is " << input_image.type() << " and target size image is " << image_of_desired_size.type() << std::endl;
-    try {
-        cvResize(input_image, image_of_desired_size, CV_INTER_LINEAR);
-    } catch (const cv::Exception &e) {
-        std::cout << e.err << std::endl;
-        std::cout << "Will exit with error." << std::endl;
-        exit(1);
-    } catch (const std::exception &e) {
-        std::cout << e.what() << std::endl;
-        std::cout << "Will exit with error." << std::endl;
-        exit(1);
-    }
-    
-    if (verbose)
-        std::cout << "Saving image as " << output_image_path << std::endl;
-    try {
-        cvSaveImage(output_image_path.c_str(), image_of_desired_size);
-    } catch (const cv::Exception &e) {
-        std::cout << e.err << std::endl;
-        std::cout << "Will exit with error." << std::endl;
-        exit(1);
-    } catch (const std::exception &e) {
-        std::cout << e.what() << std::endl;
-        std::cout << "Will exit with error." << std::endl;
-        exit(1);
-    }
-    
-    if (verbose)
-        std::cout << "Freeing image data." << std::endl;
-    cvReleaseImage(&image_of_desired_size);
-    cvReleaseImage(&input_image);
-    if (verbose)
-        std::cout << "Success!" << std::endl;
-
-    return 0;
+    return crop_and_resize(input_image_path, output_image_path, output_width, output_height, verbose);
 }
 
