@@ -53,36 +53,29 @@ int main(int argc, char *argv[]) {
     po::variables_map options;
     po::store(po::parse_command_line(argc, argv, desc), options);
     po::notify(options);
-    if (options.count("help"))
-    {
+    if (options.count("help")) {
         std::cout << desc << std::endl;
         return 0;
     }
-    if (options.count("version"))
-    {
+    if (options.count("version")) {
         std::cout << PACKAGE << " " << PACKAGE_VERSION << std::endl;
         return 0; 
     }
-    if (options.count("verbose"))
-    {
+    if (options.count("verbose")) {
         verbose = true;
     }
-    if (options.count("input"))
-    {
+    if (options.count("input")) {
         input_image_path = options["input"].as<std::string>();
-        if (! fs::exists(input_image_path))
-        {
+        if (! fs::exists(input_image_path)) {
             std::cout << "Could not find input file " << input_image_path << "." << std::endl;
             exit(1); // exit with error
         }
         if (verbose)
             std::cout << "Input image is set to " << input_image_path << std::endl;
     }
-    if (options.count("output"))
-    {
+    if (options.count("output")) {
         output_image_path = options["output"].as<std::string>();
-        if (fs::exists(output_image_path))
-        {
+        if (fs::exists(output_image_path)) {
             if (verbose)
                 std::cout << "Will overwrite image file " << output_image_path << "." << std::endl;
         }
@@ -90,14 +83,12 @@ int main(int argc, char *argv[]) {
             std::cout << "Output image file name is set to " << output_image_path << std::endl;
     } // TODO: else use input file name with a suffix?
 
-    if (options.count("width"))
-    { 
+    if (options.count("width")) { 
         output_width = options["width"].as<int>();
         if (verbose)
             std::cout << "Output width is set to " << output_width << std::endl;
     }
-    if (options.count("width"))
-    { 
+    if (options.count("width")) { 
         output_height = options["height"].as<int>();
         if (verbose)
             std::cout << "Output height is set to " << output_height << std::endl;
@@ -115,8 +106,7 @@ int main(int argc, char *argv[]) {
     if (verbose)
         std::cout << "Resizing image to " << output_width << "x" << output_height << std::endl;
 
-    //IplImage* image_of_desired_size = cvCreateImage(size, 8, 0);
-    IplImage* image_of_desired_size = cvCreateImage(size, input_image->depth, input_image->nChannels); // IPL_DEPTH_32S
+    IplImage* image_of_desired_size = cvCreateImage(size, input_image->depth, input_image->nChannels);
     
     //if (verbose)
     //    std::cout << "Image types: input is " << input_image.type() << " and target size image is " << image_of_desired_size.type() << std::endl;
@@ -150,6 +140,8 @@ int main(int argc, char *argv[]) {
         std::cout << "Freeing image data." << std::endl;
     cvReleaseImage(&image_of_desired_size);
     cvReleaseImage(&input_image);
+    if (verbose)
+        std::cout << "Success!" << std::endl;
 
     return 0;
 }
