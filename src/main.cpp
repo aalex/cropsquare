@@ -27,6 +27,7 @@
 #include <highgui.h>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+#include <algorithm> // std::min 
 
 /**
  * Reads an image, crops it, resize the result and save it as a new image. 
@@ -39,6 +40,25 @@ int crop_and_resize(std::string input_image_path, std::string output_image_path,
         std::cout << "Could not load image file " << input_image_path << std::endl;
         exit(1);
     }
+    CvSize input_size = cvGetSize(input_image);
+    if (verbose)
+        std::cout << "Input image size is " << input_size.width << "x" << input_size.height << std::endl;
+    if (verbose)
+        std::cout << "ROI will be from (0,0) to (" << std::min(input_size.width, input_size.height) << "," << std::min(input_size.width, input_size.height) << ")" << std::endl;
+
+    // TODO:
+    // // sets the Region of Interest
+    // // Note that the rectangle area has to be __INSIDE__ the image */
+    // cvSetImageROI(input_image, cvRect(0, 0, cvGetSize(input_image), 250));
+    // TODO:
+    // // create intermediary image
+    // // Note that cvGetSize will return the width and the height of ROI */
+    // IplImage *intermediary_image = cvCreateImage(cvGetSize(input_image), img1->depth, img1->nChannels);
+    /* copy subimage */
+    //cvCopy(input_image, intermediary_image, NULL);
+     /* always reset the Region of Interest to prevent issues in case we use the image later */
+    // cvResetImageROI(input_image);
+
     CvSize size = cvSize(output_width, output_height);
     if (verbose)
         std::cout << "Resizing image to " << output_width << "x" << output_height << std::endl;
