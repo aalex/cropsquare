@@ -41,34 +41,49 @@ int crop_and_resize(std::string input_image_path, std::string output_image_path,
         exit(1);
     }
     CvSize input_size = cvGetSize(input_image);
+# if 0
+    float input_ratio = float(input_size.width) / float(input_size.height);
+    float output_ratio = float(output_width) / float(output_height);
+    int tmp_width = 0;
+    int tmp_height = 0;
+    if (input_ratio > output_ratio) { // input is wider than desired
+        tmp_width = int(input_size.height * output_ratio);
+        tmp_height = input_size.height;
+    } else { // input is narrower than desired
+        tmp_width = input_size.width;
+        tmp_height = int(input_size.width * (1.0 / output_ratio)); // FIXME
+    }
+#endif 
     if (verbose)
         std::cout << "Input image size is " << input_size.width << "x" << input_size.height << std::endl;
+    int final_width = std::min(input_size.width, input_size.height);
+    int final_height = std::min(input_size.width, input_size.height);
     if (verbose)
-        std::cout << "ROI will be from (0,0) to (" << std::min(input_size.width, input_size.height) << "," << std::min(input_size.width, input_size.height) << ")" << std::endl;
+        std::cout << "ROI will be from (0,0) to (" << final_width << "," << final_height << ")" << std::endl;
 
     // TODO:
     // // sets the Region of Interest
     // // Note that the rectangle area has to be __INSIDE__ the image */
-    // cvSetImageROI(input_image, cvRect(0, 0, cvGetSize(input_image), 250));
+    cvSetImageROI(input_image, cvRect(0, 0, final_width, final_height));
     // TODO:
     // // create intermediary image
     // // Note that cvGetSize will return the width and the height of ROI */
-    // IplImage *intermediary_image = cvCreateImage(cvGetSize(input_image), img1->depth, img1->nChannels);
+    IplImage *intermediary_image = cvCreateImage(cvGetSize(input_image), input_image->depth, input_image->nChannels);
     /* copy subimage */
-    //cvCopy(input_image, intermediary_image, NULL);
+    cvCopy(input_image, intermediary_image, NULL);
      /* always reset the Region of Interest to prevent issues in case we use the image later */
-    // cvResetImageROI(input_image);
+    cvResetImageROI(input_image);
 
-    CvSize size = cvSize(output_width, output_height);
+    CvSize output_size = cvSize(output_width, output_height);
     if (verbose)
         std::cout << "Resizing image to " << output_width << "x" << output_height << std::endl;
 
-    IplImage* output_image = cvCreateImage(size, input_image->depth, input_image->nChannels);
+    IplImage* output_image = cvCreateImage(output_size, input_image->depth, input_image->nChannels);
     
     //if (verbose)
     //    std::cout << "Image types: input is " << input_image.type() << " and target size image is " << output_image.type() << std::endl;
     try {
-        cvResize(input_image, output_image, CV_INTER_LINEAR);
+        cvResize(intermediary_image, output_image, CV_INTER_LINEAR);
     } catch (const cv::Exception &e) {
         std::cout << e.err << std::endl;
         std::cout << "Will exit with error." << std::endl;
@@ -96,6 +111,7 @@ int crop_and_resize(std::string input_image_path, std::string output_image_path,
     if (verbose)
         std::cout << "Freeing image data." << std::endl;
     cvReleaseImage(&output_image);
+    cvReleaseImage(&intermediary_image);
     cvReleaseImage(&input_image);
     if (verbose)
         std::cout << "Success!" << std::endl;
