@@ -28,11 +28,13 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <algorithm> // std::min 
+#include <unistd.h> //usleep
+
 
 /**
  * Reads an image, crops it, resize the result and save it as a new image. 
  */
-int crop_and_resize(std::string input_image_path, std::string output_image_path, int output_width, int output_height, bool verbose) {
+int crop_and_resize(std::string input_image_path, std::string output_image_path, int output_width, int output_height, bool verbose, bool graphical) {
     if (verbose)
         std::cout << "Loading image " << input_image_path << std::endl;
     IplImage* input_image = cvLoadImage(input_image_path.c_str());
@@ -108,20 +110,27 @@ int crop_and_resize(std::string input_image_path, std::string output_image_path,
         exit(1);
     }
     
+    // TODO:
+    if (graphical) {
+        const char *window_name = PACKAGE;
+        std::cout << "Creating graphical window." << std::endl;
+        std::cout << "Press Escape to close the window." << std::endl;
+        cvNamedWindow(window_name, 1);
+        cvShowImage(window_name, output_image);
+        while (1) {
+            if(cvWaitKey(15) == 27)
+                break;
+            usleep(1000); // 1 ms
+        }
+    }
+
     if (verbose)
         std::cout << "Freeing image data." << std::endl;
-    cvReleaseImage(&output_image);
+    cvReleaseImage(&output_image); // Do I need the ampersands?
     cvReleaseImage(&intermediary_image);
     cvReleaseImage(&input_image);
     if (verbose)
         std::cout << "Success!" << std::endl;
-
-    // TODO:
-    // cvShowImage( name, dst );
-    // while (1) {
-    //     if(cvWaitKey(15) == 27)
-    //         break;
-    // }
     return 0;
 }
 
@@ -138,6 +147,7 @@ int main(int argc, char *argv[]) {
     //std::string mode = "default"
     int output_width = 120;
     int output_height = 120;
+    bool graphical = false;
 
     po::options_description desc(std::string(PACKAGE) + std::string(" options"));
     // std::cout << "adding options" << std::endl;
@@ -148,6 +158,7 @@ int main(int argc, char *argv[]) {
         ("output,o", po::value<std::string>()->default_value(output_image_path), "Output image file name") /* TODO: use an arg */
         ("version", "Show program's version number and exit")
         ("verbose,v", po::bool_switch(), "Enables a verbose output")
+        ("graphical,g", po::bool_switch(), "Enables the graphical interface")
         ("width,w", po::value<int>()->default_value(output_width), "Width of the resized image.")
         ("height,H", po::value<int>()->default_value(output_height), "Height of the resized images.");
     po::variables_map options;
@@ -161,9 +172,10 @@ int main(int argc, char *argv[]) {
         std::cout << PACKAGE << " " << PACKAGE_VERSION << std::endl;
         return 0; 
     }
-    if (options.count("verbose")) {
+    if (options.count("verbose"))
         verbose = true;
-    }
+    if (options.count("graphical"))
+        graphical = true;
     if (options.count("input")) {
         input_image_path = options["input"].as<std::string>();
         if (! fs::exists(input_image_path)) {
@@ -195,6 +207,6 @@ int main(int argc, char *argv[]) {
     } // TODO: make it easy to create a square image.
 
     // Now, let's do it:
-    return crop_and_resize(input_image_path, output_image_path, output_width, output_height, verbose);
+    return crop_and_resize(input_image_path, output_image_path, output_width, output_height, verbose, graphical);
 }
 
