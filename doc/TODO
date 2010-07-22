@@ -1,0 +1,17 @@
+Find the region of interest like this:
+
+1) Find edges
+
+void cvCanny( const CvArr* img, CvArr* edges, double threshold1,
+              double threshold2, int apertureSize=3 );
+
+2) Create a binary image in which we will find blobs
+
+void cvErode( const CvArr* A, CvArr* C, IplConvKernel* B=0, int iterations=1 );
+void cvDilate( const CvArr* A, CvArr* C, IplConvKernel* B=0, int iterations=1 );
+void cvThreshold( const CvArr* src, CvArr* dst, double threshold,
+                  double maxValue, int thresholdType );
+cvFindContours()
+
+3) Use the first blob as the center of the region of interest
+
