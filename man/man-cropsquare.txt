@@ -1,0 +1,4 @@
+[HISTORY]
+
+ 2010 - Written by Alexandre Quessy <alexandre@quessy.net>
+

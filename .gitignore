@@ -30,3 +30,4 @@ src/stamp-h1
 *.jpg
 *.png
 src/config.h.in~
+*.1
