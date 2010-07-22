@@ -1,8 +1,10 @@
 [SYNOPSIS]
 
-  cropsquare [-i <input image>] [options]
+cropsquare [-i <input image>] [options]
 
 [HISTORY]
 
  2010 - Written by Alexandre Quessy <alexandre@quessy.net>
 
+[SEE ALSO]
+display(1), convert(1)
