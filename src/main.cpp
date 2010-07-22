@@ -115,12 +115,14 @@ int crop_and_resize(std::string input_image_path, std::string output_image_path,
         const char *window_name = PACKAGE;
         std::cout << "Creating graphical window." << std::endl;
         std::cout << "Press Escape to close the window." << std::endl;
-        cvNamedWindow(window_name, 1);
+        int window = cvNamedWindow(window_name, CV_WINDOW_AUTOSIZE);
         cvShowImage(window_name, output_image);
         while (1) {
-            if(cvWaitKey(15) == 27)
-                break;
             usleep(1000); // 1 ms
+            if (cvWaitKey(10) == 27) { // Escape
+                cvDestroyWindow(window_name);
+                break;
+            }
         }
     }
 
