@@ -1,22 +1,21 @@
 /*
- * Toonloop
+ * cropsquare
  *
  * Copyright 2010 Alexandre Quessy
  * <alexandre@quessy.net>
- * http://www.toonloop.com
  *
- * Toonloop is free software: you can redistribute it and/or modify
+ * cropsquare is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Toonloop is distributed in the hope that it will be useful,
+ * cropsquare is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the gnu general public license
- * along with Toonloop.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cropsquare.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "config.h"
 #include <string>
@@ -79,19 +78,6 @@ int crop_and_resize(std::string input_image_path, std::string output_image_path,
     // TODO: remove this:
     cvDrawContours(input_image, contours, CV_RGB(255, 0, 0), CV_RGB(0, 255, 0), MAX_CONTOUR_LEVELS, 1, CV_AA, cvPoint(0, 0));
 
-# if 0
-    float input_ratio = float(input_size.width) / float(input_size.height);
-    float output_ratio = float(output_width) / float(output_height);
-    int tmp_width = 0;
-    int tmp_height = 0;
-    if (input_ratio > output_ratio) { // input is wider than desired
-        tmp_width = int(input_size.height * output_ratio);
-        tmp_height = input_size.height;
-    } else { // input is narrower than desired
-        tmp_width = input_size.width;
-        tmp_height = int(input_size.width * (1.0 / output_ratio)); // FIXME
-    }
-#endif 
     if (verbose)
         std::cout << "Input image size is " << input_size.width << "x" << input_size.height << std::endl;
     int final_width = std::min(input_size.width, input_size.height);
@@ -132,8 +118,7 @@ int crop_and_resize(std::string input_image_path, std::string output_image_path,
         exit(1);
     }
     
-    if (verbose)
-        std::cout << "Saving image as " << output_image_path << std::endl;
+    std::cout << "Saving the output image of " << output_width << "x" << output_height << " as " << output_image_path << std::endl;
     try {
         cvSaveImage(output_image_path.c_str(), output_image);
     } catch (const cv::Exception &e) {
@@ -214,9 +199,12 @@ int main(int argc, char *argv[]) {
         return 0; 
     }
     if (options.count("verbose"))
-        verbose = true;
-    if (options.count("graphical"))
-        graphical = true;
+        verbose = options["verbose"].as<bool>();
+    if (options.count("graphical")) {
+        if (verbose)
+            std::cout << "Enabling the graphical user interface." << std::endl;
+        graphical = options["graphical"].as<bool>();
+    }
     if (options.count("input")) {
         input_image_path = options["input"].as<std::string>();
         if (! fs::exists(input_image_path)) {
@@ -247,7 +235,38 @@ int main(int argc, char *argv[]) {
             std::cout << "Output height is set to " << output_height << std::endl;
     } // TODO: make it easy to create a square image.
 
+    if (verbose)
+        std::cout << "Done parsing the command-line options." << std::endl;
     // Now, let's do it:
-    return crop_and_resize(input_image_path, output_image_path, output_width, output_height, verbose, graphical);
+    int retval = crop_and_resize(input_image_path, output_image_path, output_width, output_height, verbose, graphical);
+    //std::cout << "Goodbye" << std::endl;
+    return retval;
 }
 
+// class Config {
+//     public:
+//         bool verbose;
+//         std::string input_image_path;
+//         std::string output_image_path;
+//         int output_width;
+//         int output_height;
+//         bool graphical;
+//         Config();
+// };
+// 
+// Config::Config()
+//
+//
+# if 0
+    float input_ratio = float(input_size.width) / float(input_size.height);
+    float output_ratio = float(output_width) / float(output_height);
+    int tmp_width = 0;
+    int tmp_height = 0;
+    if (input_ratio > output_ratio) { // input is wider than desired
+        tmp_width = int(input_size.height * output_ratio);
+        tmp_height = input_size.height;
+    } else { // input is narrower than desired
+        tmp_width = input_size.width;
+        tmp_height = int(input_size.width * (1.0 / output_ratio)); // FIXME
+    }
+#endif 
