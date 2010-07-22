@@ -1,7 +1,8 @@
-cropit
-------
+cropsquare
+----------
 
 Crops and resizes images.
+
 
 Dependencies
 ------------
@@ -9,6 +10,7 @@ Dependencies
 To build, one needs to install the following Debian packages. There should be 
 similar names for each of those on other operating systems.
 
+ * help2man
  * libcv-dev
  * libcvaux-dev
  * libhighgui-dev
