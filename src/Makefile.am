@@ -1,15 +1,15 @@
-bin_PROGRAMS = cropit 
+bin_PROGRAMS = cropsquare 
 
-cropit_SOURCES = \
+cropsquare_SOURCES = \
 	main.cpp
 
-cropit_CXXFLAGS = \
+cropsquare_CXXFLAGS = \
 	$(BOOST_CPPFLAGS) \
 	$(OPENCV_CFLAGS) \
 	$(LIBM_CXXFLAGS) \
 	$(LIBTHREAD_CXXFLAGS)
  
-cropit_LDADD = \
+cropsquare_LDADD = \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(BOOST_LDFLAGS) \
 	$(BOOST_LIBS)  \
