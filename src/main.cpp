@@ -30,6 +30,7 @@
 #include <algorithm> // std::min 
 #include <unistd.h> //usleep
 
+#define MAX_CONTOUR_LEVELS 10 //This will be used when displaying contours
 
 /**
  * Reads an image, crops it, resize the result and save it as a new image. 
@@ -43,6 +44,41 @@ int crop_and_resize(std::string input_image_path, std::string output_image_path,
         exit(1);
     }
     CvSize input_size = cvGetSize(input_image);
+
+    // Many computer vision algorithms do not use colour information. Here, we convert from RGB to greyscale before processing further.
+    IplImage *grey_image = cvCreateImage(input_size, input_image->depth, 1); // One channel, since it's greyscale
+    cvCvtColor(input_image, grey_image, CV_RGB2GRAY);
+    
+    // We then detect edges in the image using the Canny algorithm. 
+    // This will return a binary image, one where the pixel values will be 255 for 
+    // pixels that are edges and 0 otherwise. This is unlike other edge detection 
+    // algorithms like Sobel, which compute greyscale levels.
+    double thresh1 = 63; // [0,255]
+    double thresh2 = 191; // [0,255]
+    
+    IplImage *edge_image = cvCreateImage(input_size, input_image->depth, 1); // One channel, since it's greyscale
+    cvCanny(grey_image, edge_image, thresh1, thresh2, 3); //We set the threshold values and set the window size to 3
+    
+    // The edges returned by the Canny algorithm might have small holes in them, which will cause some problems during contour detection.
+    // The simplest way to solve this problem is to "dilate" the image. This is a morphological operator that will set any pixel in a binary image to 255 (on) 
+    // if it has one neighbour that is not 0. The result of this is that edges grow fatter and small holes are filled in.
+    // We re-use small_grey_image to store the results, as we won't need it anymore.
+    cvDilate(edge_image, grey_image, 0, 1);
+    
+    // CvMemStorage and CvSeq are structures used for dynamic data collection. CvMemStorage contains pointers to the actual
+    // allocated memory, but CvSeq is used to access this data. Here, it will hold the list of image contours.
+    CvMemStorage *storage = cvCreateMemStorage(0);
+    CvSeq *contours = 0;
+    // Once we have a binary image, we can look for contours in it. cvFindContours will scan through the image and store connected contours in "storage".
+    // "contours" will point to the first contour detected. CV_RETR_TREE means that the function will create a contour hierarchy. Each contour will contain 
+    // a pointer to contours that are contained inside it (holes). CV_CHAIN_APPROX_NONE means that all the contours points will be stored. Finally, an offset
+    // value can be specified, but we set it to (0,0).
+    cvFindContours(grey_image, storage, &contours, sizeof(CvContour), CV_RETR_TREE, CV_CHAIN_APPROX_NONE, cvPoint(0, 0));
+    
+    //This function will display contours on top of an image. We can specify different colours depending on whether the contour in a hole or not.
+    // TODO: remove this:
+    cvDrawContours(input_image, contours, CV_RGB(255, 0, 0), CV_RGB(0, 255, 0), MAX_CONTOUR_LEVELS, 1, CV_AA, cvPoint(0, 0));
+
 # if 0
     float input_ratio = float(input_size.width) / float(input_size.height);
     float output_ratio = float(output_width) / float(output_height);
@@ -110,17 +146,18 @@ int crop_and_resize(std::string input_image_path, std::string output_image_path,
         exit(1);
     }
     
-    // TODO:
     if (graphical) {
-        const char *window_name = PACKAGE;
+        std::string window1_name = "input";
+        std::string window2_name = "output";
         std::cout << "Creating graphical window." << std::endl;
         std::cout << "Press Escape to close the window." << std::endl;
-        int window = cvNamedWindow(window_name, CV_WINDOW_AUTOSIZE);
-        cvShowImage(window_name, output_image);
+        int window1 = cvNamedWindow(window1_name.c_str(), CV_WINDOW_AUTOSIZE);
+        int window2 = cvNamedWindow(window2_name.c_str(), CV_WINDOW_AUTOSIZE);
+        cvShowImage(window1_name.c_str(), input_image);
+        cvShowImage(window2_name.c_str(), output_image);
         while (1) {
             usleep(1000); // 1 ms
             if (cvWaitKey(10) == 27) { // Escape
-                cvDestroyWindow(window_name);
                 break;
             }
         }
@@ -128,6 +165,8 @@ int crop_and_resize(std::string input_image_path, std::string output_image_path,
 
     if (verbose)
         std::cout << "Freeing image data." << std::endl;
+    cvDestroyAllWindows(); //releases all the windows created so far
+
     cvReleaseImage(&output_image); // Do I need the ampersands?
     cvReleaseImage(&intermediary_image);
     cvReleaseImage(&input_image);
