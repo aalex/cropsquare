@@ -1,3 +1,7 @@
+[SYNOPSIS]
+
+  cropsquare [-i <input image>] [options]
+
 [HISTORY]
 
  2010 - Written by Alexandre Quessy <alexandre@quessy.net>
