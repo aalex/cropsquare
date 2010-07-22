@@ -116,6 +116,12 @@ int crop_and_resize(std::string input_image_path, std::string output_image_path,
     if (verbose)
         std::cout << "Success!" << std::endl;
 
+    // TODO:
+    // cvShowImage( name, dst );
+    // while (1) {
+    //     if(cvWaitKey(15) == 27)
+    //         break;
+    // }
     return 0;
 }
 
